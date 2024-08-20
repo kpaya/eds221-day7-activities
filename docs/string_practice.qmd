@@ -1,0 +1,56 @@
+---
+title: "string_practice"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+alarm_report<-tibble::tribble(
+         ~date,           ~building,                                               ~alarm_message,
+  "2020-03-14", "Engineering-North", "10:02am -- HVAC system down, facilities management alerted",
+  "2020-03-15",         "Bren Hall",                    "8:24am -- Elevator North out of service",
+  "2020-04-10", "Engineering-South",     "12:41am -- Fire alarm, UCSB fire responded and cleared",
+  "2020-04-18",        "Engr-North",     "9:58pm -- Campus point emergency siren, UCPD responded"
+  )
+
+view(alarm_report)
+```
+
+
+Practice working with strings by writing code to update alarm_report as follows (these can be separate, or all as part of a piped sequence):
+
+Replace the “Engr” with “Engineering” in the building column
+Separate the building column into two separate columns, building and wing, separated at the dash
+Only keep observations with the word “responded” in the alarm_message column
+Separate the message time from the rest of the message by separating at --
+Convert the date column to a Date class using lubridate
+
+```{r}
+#Replace the “Engr” with “Engineering” in the building column
+update_alarm_report1<- alarm_report %>% 
+  mutate(building = str_replace(building,
+                            pattern = "Engr-",
+                            replacement = "Engineering-"))
+
+#Separate the building column into two separate columns, building and wing, separated at the dash
+update_alarm_report2 <- update_alarm_report1 %>%
+  separate(building, into = c("building", "wing"), sep = "-")
+
+#Only keep observations with the word “responded” in the alarm_message column
+update_alarm_report3<-update_alarm_report2%>%
+  filter(str_detect(alarm_message,"responded"))
+
+#Separate the message time from the rest of the message by separating at --
+update_alarm_report4 <- update_alarm_report2 %>%
+  separate(alarm_message, into = c("message time", "message"), sep = "--")
+
+#Convert the date column to a Date class using lubridate
+update_alarm_report5 <- update_alarm_report4 %>%
+  mutate(date = ymd(date))
+
+class(update_alarm_report5$date)
+
+
+```
+
